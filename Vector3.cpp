@@ -30,6 +30,12 @@ float Vector3::Distance(Vector3 v1, Vector3 v2)
 	return dist.magnitude(); 
 }
 
+Vector3 Vector3::Midpoint(Vector3 v1, Vector3 v2)
+{
+	Vector3 midpoint = 0.5f * (v2 - v1);
+	return v1 + midpoint;
+}
+
 Vector3 Vector3::Project(Vector3 a, Vector3 b) 
 { 
 	return a * (Dot(a, b) / a.magnitudeSquared()); 

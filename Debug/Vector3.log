@@ -1,2 +1,3 @@
 ﻿  main.cpp
+C:\Users\Ryan\source\repos\Vector3\Vector3\Charge.h(10,32): warning C4305: 'initializing': truncation from 'double' to 'const float'
   Vector3.vcxproj -> C:\Users\Ryan\source\repos\Vector3\Debug\Vector3.exe

@@ -19,12 +19,13 @@ public:
 	static float Dot(Vector3 v1, Vector3 v2); 
 	static Vector3 Cross(Vector3 v1, Vector3 v2); 
 	static float Angle(Vector3 v1, Vector3 v2); 
-	static float Distance(Vector3 v1, Vector3 v2); 
+	static float Distance(Vector3 v1, Vector3 v2);
+	static Vector3 Midpoint(Vector3 v1, Vector3 v2);
 	static Vector3 Project(Vector3 v1, Vector3 v2); 
 	static Vector3 Reflect(Vector3 v1, Vector3 v2);
 
 	Vector3 operator*(const float n) { return Vector3(n * x, n * y, n * z); } 
-	friend Vector3 operator*(const float &n, const Vector3 &vect) { return n * vect; } 
+	friend Vector3 operator*(const float n, Vector3 vect) { return Vector3(n * vect.x, n * vect.y, n * vect.z); } 
 	Vector3 operator/(const float n) { return Vector3(x / n, y / n, z / n); } 
 	Vector3 operator+(const Vector3 other) { return Vector3(x + other.x, y + other.y, z + other.z); } 
 	Vector3 operator-(const Vector3 other) { return Vector3(x - other.x, y - other.y, z - other.z); } 
@@ -37,6 +38,7 @@ public:
 	float y; 
 	float z;
 
+	Vector3() { x = 0; y = 0; z = 0; }
 	Vector3(float x_value, float y_value, float z_value) { x = x_value; y = y_value; z = z_value; }
 
 	const float magnitude(); 
