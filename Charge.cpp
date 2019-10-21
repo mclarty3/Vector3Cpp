@@ -1,5 +1,8 @@
 #include "pch.h" 
 #include "Charge.h"
+#include <iostream>
+
+#define PI 3.14159265358979
 
 Charge::Charge(Vector3 pos, float q, float r, std::function<Vector3(Vector3 testPoint)> eFieldFunc)
 {
@@ -20,9 +23,10 @@ Charge Charge::Monopole(Vector3 pos, float q)
 	return Charge(pos, q, 0, eFieldFunc);
 }
 
-//TO-DO: Make this so that it calculates the force for both charges individually and adds them (way easier)
-/* I don't like the way this is done, because it won't work in three dimensions unless the 
-   test point is in the plane perpendicular to the dipole moment*/
+/* I'm gonna hold off on these for this commit, I really want to figure out a general way to
+   calculate electric fields for these shapes in 3D regardless of orientation. Maybe I'll need
+   calculus, who knows!
+
 Charge Charge::Dipole(Vector3 pos1, Vector3 pos2, float q, float q2)
 {
 	// Defaults to dipole with equal but opposite charges
@@ -74,6 +78,7 @@ Charge Charge::Loop(Vector3 centerPos, Vector3 radius, float chargeDensity)
 
 Charge Charge::Loop(float charge, Vector3 centerPos, Vector3 radius)
 {
+	//std::function<Vector3(Vector3 testPoint)> eFieldFunc = []
 	return Charge();
 }
 
@@ -86,13 +91,71 @@ Charge Charge::Disk(float charge, Vector3 centerPos, Vector3 radius)
 {
 	return Charge();
 }
+*/
 
-Charge Charge::Sphere(float charge, Vector3 centerPos, Vector3 radius)
+Charge Charge::HollowSphere(float charge, Vector3 centerPos, float radius)
 {
-	return Charge();
+
+	float chargeDensity = charge / ((4 / 3) * PI * pow(radius, 3));
+	return Charge::HollowSphere(centerPos, radius, chargeDensity);
 }
 
-Charge Charge::Sphere(Vector3 centerPos, Vector3 radius, float chargeDensity)
+Charge Charge::HollowSphere(Vector3 centerPos, float radius, float chargeDensity)
 {
-	return Charge();
+	float charge = chargeDensity * ((4 / 3) * PI * pow(radius, 3));
+	std::function<Vector3(Vector3 testPoint)> eFieldFunc = [centerPos, radius, chargeDensity](Vector3 testPoint)
+	{
+		if ((testPoint - centerPos).magnitude() < radius) {
+			return Vector3::zero;
+		}
+		Vector3 dist = testPoint - centerPos;\
+		double distMag = dist.magnitude();
+		double aSquared = pow(radius, 2);
+		double zSquared = pow(distMag, 2);
+		double forceMagnitude = ((2 * PI * k * chargeDensity * radius) / (double(2) * (zSquared))) * 
+							   (((aSquared - zSquared) / (radius + distMag) + double(2 * distMag)) + 
+			                   (zSquared - aSquared) / (distMag - radius));
+		return forceMagnitude * dist.normalized();
+	};
+	return Charge(centerPos, charge, radius, eFieldFunc);
+}
+
+Charge Charge::SolidSphere(float charge, Vector3 centerPos, float radius)
+{
+	std::function<Vector3(Vector3 testPoint)> eFieldFunc = [charge, centerPos, radius](Vector3 testPoint)
+	{
+		Vector3 dist = testPoint - centerPos;
+		Vector3 force;
+		if (dist.magnitude() < radius) // Inside sphere
+		{
+			float chargeDensity = charge / ((4 / 3) * PI * pow(radius, 3));
+			force = ((chargeDensity * radius) / (3 * epsilonNaught)) * dist.normalized();
+		}
+		else {
+			force = (((k * charge) / dist.magnitudeSquared()) * radius) * dist.normalized();
+		}
+		return force;
+	};
+
+	return Charge(centerPos, charge, radius, eFieldFunc);
+}
+
+Charge Charge::SolidSphere(Vector3 centerPos, float radius, float chargeDensity)
+{
+	float charge = 0;
+	std::function<Vector3(Vector3 testPoint)> eFieldFunc = [centerPos, radius, chargeDensity, &charge](Vector3 testPoint)
+	{
+		Vector3 dist = testPoint - centerPos;
+		Vector3 force;
+		if (dist.magnitude() < radius) // Inside sphere
+		{
+			force = ((chargeDensity * radius) / (3 * epsilonNaught)) * dist.normalized();
+		}
+		else {
+			charge = chargeDensity * ((4 / 3) * PI * pow(radius, 3));
+			force = ((((k * charge) / dist.magnitudeSquared())) * radius) * dist.normalized();
+		}
+		return force;
+	};
+	return Charge(centerPos, charge, radius, eFieldFunc);
 }

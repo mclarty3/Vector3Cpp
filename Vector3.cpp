@@ -9,72 +9,70 @@ Vector3 Vector3::up = Vector3(0, 1, 0);
 Vector3 Vector3::down = Vector3(0, -1, 0); 
 Vector3 Vector3::zero = Vector3(0, 0, 0);
 
-float Vector3::Dot(Vector3 v1, Vector3 v2) 
+Vector3::Vector3(Vector3 direction, float length)
+{
+	Vector3 velocity = direction.normalized();
+	x = velocity.x * length;
+	y = velocity.y * length;
+	z = velocity.z * length;
+}
+
+float Vector3::Dot(const Vector3 v1, const Vector3 v2) 
 { 
 	return (v1.x * v2.x) + (v1.y + v2.y) + (v1.z + v2.z); 
 }
 
-Vector3 Vector3::Cross(Vector3 v1, Vector3 v2) 
+Vector3 Vector3::Cross(const Vector3 v1, const Vector3 v2)
 { 
 	return Vector3((v1.y * v2.z) - (v1.z * v2.y), (v1.z * v2.x) - (v1.x * v2.z), (v1.x * v2.y) - (v1.y * v2.x)); 
 }
 
-float Vector3::Angle(Vector3 v1, Vector3 v2) 
+float Vector3::Angle(const Vector3 v1, const Vector3 v2)
 { 
 	return acos(Dot(v1, v2) / (v1.magnitude() * v2.magnitude())); 
 }
 
-float Vector3::Distance(Vector3 v1, Vector3 v2) 
+float Vector3::Distance(const Vector3 v1, const Vector3 v2)
 { 
 	Vector3 dist = v1 - v2; 
 	return dist.magnitude(); 
 }
 
-Vector3 Vector3::Midpoint(Vector3 v1, Vector3 v2)
+Vector3 Vector3::Midpoint(const Vector3 v1, const Vector3 v2)
 {
 	Vector3 midpoint = 0.5f * (v2 - v1);
 	return v1 + midpoint;
 }
 
-Vector3 Vector3::Project(Vector3 a, Vector3 b) 
+Vector3 Vector3::Project(const Vector3 a, const Vector3 b)
 { 
 	return a * (Dot(a, b) / a.magnitudeSquared()); 
 }
 
-Vector3 Vector3::Reflect(Vector3 a, Vector3 b) 
+Vector3 Vector3::Reflect(const Vector3 a, const Vector3 b)
 { 
-	b.Normalize(); 
-	return a - (2 * Dot(a, b) * b); 
+	return a - (2 * Dot(a, b.normalized()) * b.normalized()); 
 }
 
-const float Vector3::magnitude() 
+float Vector3::magnitude() const
 { 
-	return sqrt(Dot(*this, *this)); 
+	return sqrt(abs(Dot(*this, *this))); 
+	
 }
 
-const float Vector3::magnitudeSquared() 
+float Vector3::magnitudeSquared() const 
 { 
-	return Dot(*this, *this); 
+	return abs(Dot(*this, *this)); 
 }
 
-const Vector3 Vector3::normalized() 
+Vector3 Vector3::normalized() const
 { 
-	float mag = this->magnitude(); 
-	if (mag >= 1) { 
-		return *this / mag; 
-	} else { 
-		return zero; 
-	} 
+	return *this / this->magnitude();
 }
 
 void Vector3::Normalize() 
 { 
-	float mag = this->magnitude(); 
-	if (mag >= 1) { 
-		*this = *this / mag; 
-	} else { 
-		*this = zero; 
-	} 
+	*this = *this / this->magnitude();
 }
 
 std::ostream & operator<<(std::ostream & os, const Vector3 & v)
