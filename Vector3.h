@@ -46,4 +46,5 @@ public:
 	float magnitudeSquared() const; 
 	Vector3 normalized() const; 
 	void Normalize();
+	void Clamp(float n);
 };

@@ -75,6 +75,11 @@ void Vector3::Normalize()
 	*this = *this / this->magnitude();
 }
 
+void Vector3::Clamp(float n)
+{
+	*this = this->normalized() * n;
+}
+
 std::ostream & operator<<(std::ostream & os, const Vector3 & v)
 {
 	os << "<" << v.x << ",  " << v.y << ", " << v.z << ">"; return os;

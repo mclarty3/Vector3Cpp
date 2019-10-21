@@ -19,9 +19,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vector3.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VectorField.h">
+    <ClInclude Include="Charge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,7 +35,7 @@
     <ClCompile Include="Vector3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="VectorField.cpp">
+    <ClCompile Include="Charge.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

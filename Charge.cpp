@@ -4,23 +4,31 @@
 
 #define PI 3.14159265358979
 
-Charge::Charge(Vector3 pos, float q, float r, std::function<Vector3(Vector3 testPoint)> eFieldFunc)
+Charge::Charge(Vector3 pos, float q, float r, std::function<Vector3(Vector3 testPoint)> eFieldFunc,
+               std::function<float(Vector3)> potentialFunc)
 {
 	position = pos;
 	charge = q;
 	radius = r;
-	getFieldAtPoint = eFieldFunc;
+	getEFieldAtPoint = eFieldFunc;
+	getPotentialAtPoint = potentialFunc;
 }
 
 Charge Charge::Monopole(Vector3 pos, float q)
 {
-	std::function<Vector3(Vector3 test)> eFieldFunc = [pos, q](Vector3 test) 
+	std::function<Vector3(Vector3)> eFieldFunc = [pos, q](Vector3 testPoint) 
 	{ 
-		Vector3 dist = test - pos;
+		Vector3 dist = testPoint - pos;
 		float forceMagnitude = (k * q) / dist.magnitudeSquared();
 		return forceMagnitude * dist.normalized();
 	};
-	return Charge(pos, q, 0, eFieldFunc);
+
+	std::function<float(Vector3)> potentFunc = [pos, q](Vector3 testPoint)
+	{
+		Vector3 dist = testPoint - pos;
+		return (k * q) / dist.magnitude();
+	};
+	return Charge(pos, q, 0, eFieldFunc, potentFunc);
 }
 
 /* I'm gonna hold off on these for this commit, I really want to figure out a general way to
@@ -95,55 +103,41 @@ Charge Charge::Disk(float charge, Vector3 centerPos, Vector3 radius)
 
 Charge Charge::HollowSphere(float charge, Vector3 centerPos, float radius)
 {
-
-	float chargeDensity = charge / ((4 / 3) * PI * pow(radius, 3));
-	return Charge::HollowSphere(centerPos, radius, chargeDensity);
+	std::function<Vector3(Vector3)> eFieldFunc = [centerPos, radius, charge](Vector3 testPoint)
+	{
+		if ((testPoint - centerPos).magnitude() < radius) {
+			return Vector3::zero;
+		}
+		Vector3 dist = testPoint - centerPos;
+		return ((k * charge) / dist.magnitudeSquared()) * dist.normalized();
+	};
+	std::function<float(Vector3)> potentFunc = [centerPos, radius, charge](Vector3 testPoint)
+	{
+		if ((testPoint - centerPos).magnitude() < radius) {
+			testPoint.Clamp(radius); // Sets the magnitude of the test point to the radius of the sphere
+		}
+		Vector3 dist = testPoint - centerPos;
+		return ((k * charge) / dist.magnitude());
+	};
+	return Charge(centerPos, charge, radius, eFieldFunc, potentFunc);
 }
 
 Charge Charge::HollowSphere(Vector3 centerPos, float radius, float chargeDensity)
 {
 	float charge = chargeDensity * ((4 / 3) * PI * pow(radius, 3));
-	std::function<Vector3(Vector3 testPoint)> eFieldFunc = [centerPos, radius, chargeDensity](Vector3 testPoint)
-	{
-		if ((testPoint - centerPos).magnitude() < radius) {
-			return Vector3::zero;
-		}
-		Vector3 dist = testPoint - centerPos;\
-		double distMag = dist.magnitude();
-		double aSquared = pow(radius, 2);
-		double zSquared = pow(distMag, 2);
-		double forceMagnitude = ((2 * PI * k * chargeDensity * radius) / (double(2) * (zSquared))) * 
-							   (((aSquared - zSquared) / (radius + distMag) + double(2 * distMag)) + 
-			                   (zSquared - aSquared) / (distMag - radius));
-		return forceMagnitude * dist.normalized();
-	};
-	return Charge(centerPos, charge, radius, eFieldFunc);
+	return Charge::HollowSphere(charge, centerPos, radius);
 }
 
 Charge Charge::SolidSphere(float charge, Vector3 centerPos, float radius)
 {
-	std::function<Vector3(Vector3 testPoint)> eFieldFunc = [charge, centerPos, radius](Vector3 testPoint)
-	{
-		Vector3 dist = testPoint - centerPos;
-		Vector3 force;
-		if (dist.magnitude() < radius) // Inside sphere
-		{
-			float chargeDensity = charge / ((4 / 3) * PI * pow(radius, 3));
-			force = ((chargeDensity * radius) / (3 * epsilonNaught)) * dist.normalized();
-		}
-		else {
-			force = (((k * charge) / dist.magnitudeSquared()) * radius) * dist.normalized();
-		}
-		return force;
-	};
-
-	return Charge(centerPos, charge, radius, eFieldFunc);
+	float chargeDensity = charge / ((4 / 3) * PI * pow(radius, 3));
+	return Charge::SolidSphere(centerPos, radius, chargeDensity);
 }
 
 Charge Charge::SolidSphere(Vector3 centerPos, float radius, float chargeDensity)
 {
 	float charge = 0;
-	std::function<Vector3(Vector3 testPoint)> eFieldFunc = [centerPos, radius, chargeDensity, &charge](Vector3 testPoint)
+	std::function<Vector3(Vector3)> eFieldFunc = [centerPos, radius, chargeDensity, &charge](Vector3 testPoint)
 	{
 		Vector3 dist = testPoint - centerPos;
 		Vector3 force;
@@ -157,5 +151,17 @@ Charge Charge::SolidSphere(Vector3 centerPos, float radius, float chargeDensity)
 		}
 		return force;
 	};
-	return Charge(centerPos, charge, radius, eFieldFunc);
+	std::function<float(Vector3)> potentFunc = [centerPos, radius, chargeDensity, charge](Vector3 testPoint)
+	{
+		Vector3 dist = testPoint - centerPos;
+		float potential;
+		if (dist.magnitude() < radius) { // Inside sphere
+			potential = ((k * charge) / (2 * radius)) * (3 - (dist.magnitudeSquared() / pow(radius, 2)));
+		}
+		else { // Outside sphere
+			potential = (k * charge) / dist.magnitude();
+		}
+		return potential;
+	};
+	return Charge(centerPos, charge, radius, eFieldFunc, potentFunc);
 }

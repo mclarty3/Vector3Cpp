@@ -12,9 +12,13 @@ class Charge {
 	
 public:
 
-	std::function<Vector3(Vector3 testPoint)> getFieldAtPoint; // Function that returns an electric field vector at any point
+	// Function that returns an electric field vector at any point
+	std::function<Vector3(Vector3 testPoint)> getEFieldAtPoint;
+	// Function that returns the potential at a certain point
+	std::function<float(Vector3 testPoint)> getPotentialAtPoint; 
 
-	Charge(Vector3 pos, float charge, float radius, std::function<Vector3(Vector3)> getChargeFunc);
+	Charge(Vector3 pos, float charge, float radius, std::function<Vector3(Vector3)> getChargeFunc,
+		   std::function<float(Vector3)> getPotentialFunc);
 	Charge() { position = Vector3::zero; charge = 0; radius = 0; }
 
 	static Charge Monopole(Vector3 pos, float q);
