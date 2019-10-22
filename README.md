@@ -1,11 +1,10 @@
 # Update
 In this update, I've added an electrostatic charge class, to simulate various electric charge distributions and calculate 
-the electric field and potential they create.
+the electric field and potential they create. I've also added a ChargeSystem class to keep track of multiple charges and be able to calculate the electric field and potential from all of them.
 
-Currently, you can create a monopole, hollow, or solid sphere, and calculate the field vector it creates at a specified point.
+Currently, you can create a monopole, hollow, or solid sphere, and calculate the field vector and potential it creates at a specified point.
 
-Coming up, I will be implementing other charge distributions, including dipoles, lines, rings, and disks. I'm also going to 
-add functions to calculate potential, and a system class to facilitate simulating an arbitrary number of charges.
+Coming up, I will be implementing other charge distributions, including dipoles, lines, rings, and disks.
 
 # Overview
 This is a small library I wrote to store and manipulate 3D vectors.
