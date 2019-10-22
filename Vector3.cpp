@@ -8,6 +8,7 @@ Vector3 Vector3::right = Vector3(1, 0, 0);
 Vector3 Vector3::up = Vector3(0, 1, 0); 
 Vector3 Vector3::down = Vector3(0, -1, 0); 
 Vector3 Vector3::zero = Vector3(0, 0, 0);
+Vector3 Vector3::infinity = Vector3(INFINITY, INFINITY, INFINITY);
 
 Vector3::Vector3(Vector3 direction, float length)
 {
@@ -82,6 +83,6 @@ void Vector3::Clamp(float n)
 
 std::ostream & operator<<(std::ostream & os, const Vector3 & v)
 {
-	os << "<" << v.x << ",  " << v.y << ", " << v.z << ">"; return os;
+	os << "<" << v.x << ", " << v.y << ", " << v.z << ">"; return os;
 }
 

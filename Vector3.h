@@ -15,6 +15,7 @@ public:
 	static Vector3 up; 
 	static Vector3 down; 
 	static Vector3 zero;
+	static Vector3 infinity;
 
 	static float Dot(const Vector3 v1, const Vector3 v2); 
 	static Vector3 Cross(const Vector3 v1, const Vector3 v2);
