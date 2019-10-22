@@ -24,6 +24,9 @@
     <ClInclude Include="Charge.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ChargeSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -36,6 +39,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Charge.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ChargeSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
