@@ -10,8 +10,8 @@ Charge::Charge(Vector3 pos, float q, float r, std::function<Vector3(Vector3 test
 	position = pos;
 	charge = q;
 	radius = r;
-	getEFieldAtPoint = eFieldFunc;
-	getPotentialAtPoint = potentialFunc;
+	GetEFieldAtPoint = eFieldFunc;
+	GetPotentialAtPoint = potentialFunc;
 }
 
 Charge Charge::Monopole(Vector3 pos, float q)
@@ -19,6 +19,9 @@ Charge Charge::Monopole(Vector3 pos, float q)
 	std::function<Vector3(Vector3)> eFieldFunc = [pos, q](Vector3 testPoint) 
 	{ 
 		Vector3 dist = testPoint - pos;
+		if (dist.magnitude() == 0) {
+			return Vector3::infinity;
+		}
 		float forceMagnitude = (k * q) / dist.magnitudeSquared();
 		return forceMagnitude * dist.normalized();
 	};
@@ -141,7 +144,10 @@ Charge Charge::SolidSphere(Vector3 centerPos, float radius, float chargeDensity)
 	{
 		Vector3 dist = testPoint - centerPos;
 		Vector3 force;
-		if (dist.magnitude() < radius) // Inside sphere
+		if (dist.magnitude() == 0) {
+			force = Vector3::infinity;
+		}
+		else if (dist.magnitude() < radius) // Inside sphere
 		{
 			force = ((chargeDensity * radius) / (3 * epsilonNaught)) * dist.normalized();
 		}

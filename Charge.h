@@ -12,17 +12,26 @@ class Charge {
 	
 public:
 
-	// Function that returns an electric field vector at any point
-	std::function<Vector3(Vector3 testPoint)> getEFieldAtPoint;
-	// Function that returns the potential at a certain point
-	std::function<float(Vector3 testPoint)> getPotentialAtPoint; 
+	// Function that returns an electric field vector due to this charge at any point
+	std::function<Vector3(Vector3 testPoint)> GetEFieldAtPoint;
+	// Function that returns the potential due to this charge at a certain point
+	std::function<float(Vector3 testPoint)> GetPotentialAtPoint; 
 
+	Vector3 GetPosition() { return position; }
+	void SetPosition(Vector3 newPos) { position = newPos; }
+
+	float GetCharge() { return charge; }
+	void SetCharge(float newCharge) { charge = newCharge; }
+
+	// Constructors
 	Charge(Vector3 pos, float charge, float radius, std::function<Vector3(Vector3)> getChargeFunc,
 		   std::function<float(Vector3)> getPotentialFunc);
 	Charge() { position = Vector3::zero; charge = 0; radius = 0; }
 
 	static Charge Monopole(Vector3 pos, float q);
-	/*
+
+	/* Commented out until I find a way to make these work convincingly in three dimensions
+
 	static Charge Dipole(Vector3 pos1, Vector3 pos2, float q, float q2 = 0);
 	static Charge Dipole(Vector3 pos, Vector3 dipoleMoment);
 
@@ -34,7 +43,8 @@ public:
 	static Charge Loop(float charge, Vector3 centerPos, Vector3 radius);
 
 	static Charge Disk(Vector3 centerPos, Vector3 radius, float chargeDensity);
-	static Charge Disk(float charge, Vector3 centerPos, Vector3 radius);*/
+	static Charge Disk(float charge, Vector3 centerPos, Vector3 radius);
+	*/
 
 	static Charge HollowSphere(float charge, Vector3 centerPos, float radius);
 	static Charge HollowSphere(Vector3 centerPos, float radius, float chargeDensity);
