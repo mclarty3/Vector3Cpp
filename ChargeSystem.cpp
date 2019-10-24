@@ -6,14 +6,12 @@ ChargeSystem::ChargeSystem(int maxCharges, Charge chargesToAdd[], int numCharges
 {
 	maxSize = maxCharges;
 	charges = new Charge[maxCharges];
+	currentCharges = 0;
 
 	if (numCharges > 0) {
 		for (int i = 0; i < numCharges; i++) {
 			AddCharge(chargesToAdd[i]);
 		}
-	}
-	else {
-		currentCharges = 0;
 	}
 }
 
@@ -52,7 +50,7 @@ void ChargeSystem::AddCharges(Charge chargesToAdd[], int numCharges)
 
 void ChargeSystem::RemoveCharge(int index)
 {
-	if (index < currentCharges) {
+	if (index >= 0 && index < currentCharges) {
 		for (int i = index; i < currentCharges - 1; i++) {
 			charges[i] = charges[i + 1];
 		}
@@ -60,6 +58,13 @@ void ChargeSystem::RemoveCharge(int index)
 	}
 	else {
 		std::cout << "Index out of range!" << std::endl;
+	}
+}
+
+void ChargeSystem::PrintCharges()
+{
+	for (int i = 0; i < currentCharges; i++) {
+		charges[i].Print();
 	}
 }
 
