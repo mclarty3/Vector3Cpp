@@ -4,25 +4,30 @@
 #include <iostream> 
 
 class Vector3 {
-private:
-
 
 public:
-	static Vector3 forward; 
-	static Vector3 backward; 
-	static Vector3 left; 
-	static Vector3 right; 
-	static Vector3 up; 
-	static Vector3 down; 
-	static Vector3 zero;
-	static Vector3 infinity;
+	static Vector3 forward;	 // <0, 0, 1>
+	static Vector3 backward; // <0, 0, -1> 
+	static Vector3 left;	 // <-1, 0, 0>
+	static Vector3 right;	 // <1, 0, 0>
+	static Vector3 up;	     // <0, 1, 0>
+	static Vector3 down;	 // <0, -1, 0>
+	static Vector3 zero;     // <0, 0, 0>
+	static Vector3 infinity; // <inf, inf, inf>
 
+	// Returns dot product of v1 and v2
 	static float Dot(const Vector3 v1, const Vector3 v2); 
+	// Returns cross product of v1 and v2
 	static Vector3 Cross(const Vector3 v1, const Vector3 v2);
+	// Returns angle between v1 and v2
 	static float Angle(Vector3 v1, const Vector3 v2);
+	// Returns distance between tips of v1 and v2
 	static float Distance(const Vector3 v1, const Vector3 v2);
+	// Returns midpoint between v1 and v2
 	static Vector3 Midpoint(const Vector3 v1, const Vector3 v2);
+	// Returns projection of v1 onto v2
 	static Vector3 Project(const Vector3 v1, const Vector3 v2);
+	// Returns reflection of v1 onto v2
 	static Vector3 Reflect(const Vector3 v1, const Vector3 v2);
 
 	Vector3 operator*(float n) const { return Vector3(n * x, n * y, n * z); } 
@@ -43,9 +48,14 @@ public:
 	Vector3(float x_value, float y_value, float z_value) { x = x_value; y = y_value; z = z_value; }
 	Vector3(Vector3 direction, float length);
 
+	// Returns magnitude of vector
 	float magnitude() const; 
+	// Returns magnitude squared of vector
 	float magnitudeSquared() const; 
+	// Returns normalized version of vector
 	Vector3 normalized() const; 
+	// Normalizes vector
 	void Normalize();
+	// Clamps vector to magnitude of n
 	void Clamp(float n);
 };
