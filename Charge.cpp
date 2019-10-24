@@ -4,14 +4,26 @@
 
 #define PI 3.14159265358979
 
+void Charge::Print()
+{
+	std::cout << chargeString << " at " << position << " with charge " << charge;
+	if (radius > 0) {
+		std::cout << " and radius " << radius << std::endl;
+	}
+	else {
+		std::cout << std::endl;
+	}
+}
+
 Charge::Charge(Vector3 pos, float q, float r, std::function<Vector3(Vector3 testPoint)> eFieldFunc,
-               std::function<float(Vector3)> potentialFunc)
+               std::function<float(Vector3)> potentialFunc, std::string nameOfCharge)
 {
 	position = pos;
 	charge = q;
 	radius = r;
 	GetEFieldAtPoint = eFieldFunc;
 	GetPotentialAtPoint = potentialFunc;
+	chargeString = nameOfCharge;
 }
 
 Charge Charge::Monopole(Vector3 pos, float q)
@@ -31,7 +43,7 @@ Charge Charge::Monopole(Vector3 pos, float q)
 		Vector3 dist = testPoint - pos;
 		return (k * q) / dist.magnitude();
 	};
-	return Charge(pos, q, 0, eFieldFunc, potentFunc);
+	return Charge(pos, q, 0, eFieldFunc, potentFunc, "Monopole");
 }
 
 
@@ -62,7 +74,7 @@ Charge Charge::Dipole(Vector3 negativeChargePos, Vector3 positiveChargePos, floa
 		}
 		return Vector3::Dot(dipoleMoment, distToMidpoint.normalized()) * k / distToMidpoint.magnitudeSquared();
 	};
-	return Charge(midpoint, q, 0, eFieldFunc, potentialFunc);
+	return Charge(midpoint, q, 0, eFieldFunc, potentialFunc, "Dipole");
 }
 
 Charge Charge::Dipole(Vector3 midpointPos, Vector3 dipoleMoment)
@@ -86,7 +98,7 @@ Charge Charge::Dipole(Vector3 midpointPos, Vector3 dipoleMoment)
 		}
 		return Vector3::Dot(dipoleMoment, distToMidpoint.normalized()) * k / distToMidpoint.magnitudeSquared();
 	};
-	return Charge(midpointPos, 0, 0, eFieldFunc, potentialFunc); // This shouldn't have 0 charge
+	return Charge(midpointPos, 0, 0, eFieldFunc, potentialFunc, "Dipole"); // This shouldn't have 0 charge
 }
 
 
@@ -149,7 +161,7 @@ Charge Charge::HollowSphere(float charge, Vector3 centerPos, float radius)
 		Vector3 dist = testPoint - centerPos;
 		return ((k * charge) / dist.magnitude());
 	};
-	return Charge(centerPos, charge, radius, eFieldFunc, potentFunc);
+	return Charge(centerPos, charge, radius, eFieldFunc, potentFunc, "Hollow sphere");
 }
 
 Charge Charge::HollowSphere(Vector3 centerPos, float radius, float chargeDensity)
@@ -196,5 +208,5 @@ Charge Charge::SolidSphere(Vector3 centerPos, float radius, float chargeDensity)
 		}
 		return potential;
 	};
-	return Charge(centerPos, charge, radius, eFieldFunc, potentFunc);
+	return Charge(centerPos, charge, radius, eFieldFunc, potentFunc, "Solid sphere");
 }
