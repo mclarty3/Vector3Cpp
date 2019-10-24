@@ -34,38 +34,65 @@ Charge Charge::Monopole(Vector3 pos, float q)
 	return Charge(pos, q, 0, eFieldFunc, potentFunc);
 }
 
+
+Charge Charge::Dipole(Vector3 negativeChargePos, Vector3 positiveChargePos, float q)
+{
+	float q2 = -q;
+
+	Vector3 dist = positiveChargePos - negativeChargePos;
+	Vector3 midpoint = Vector3::Midpoint(positiveChargePos, negativeChargePos);
+	Vector3 dipoleMoment = dist * q;
+	std::function<Vector3(Vector3)> eFieldFunc = [midpoint, dipoleMoment](Vector3 testPoint)
+	{
+		Vector3 distToMidpoint = testPoint - midpoint;
+		if (distToMidpoint.magnitude() == 0) {
+			return Vector3::infinity;
+		}
+		Vector3 distUnitVect = distToMidpoint.normalized();
+		
+		return k * (3 * Vector3::Dot(distUnitVect, dipoleMoment) * distUnitVect - dipoleMoment) / 
+			   pow(distToMidpoint.magnitude(), 3);
+	};
+	
+	std::function<float(Vector3)> potentialFunc = [midpoint, dipoleMoment](Vector3 testPoint)
+	{
+		Vector3 distToMidpoint = testPoint - midpoint;
+		if (distToMidpoint.magnitude() == 0) {
+			return INFINITY;
+		}
+		return Vector3::Dot(dipoleMoment, distToMidpoint.normalized()) * k / distToMidpoint.magnitudeSquared();
+	};
+	return Charge(midpoint, q, 0, eFieldFunc, potentialFunc);
+}
+
+Charge Charge::Dipole(Vector3 midpointPos, Vector3 dipoleMoment)
+{
+	std::function<Vector3(Vector3)> eFieldFunc = [midpointPos, dipoleMoment](Vector3 testPoint)
+	{
+		Vector3 distToMidpoint = testPoint - midpointPos;
+		if (distToMidpoint.magnitude() == 0) {
+			return Vector3::infinity;
+		}
+		Vector3 distUnitVect = distToMidpoint.normalized();
+
+		return k * (3 * Vector3::Dot(distUnitVect, dipoleMoment) * distUnitVect - dipoleMoment) /
+			pow(distToMidpoint.magnitude(), 3);
+	};
+	std::function<float(Vector3)> potentialFunc = [midpointPos, dipoleMoment](Vector3 testPoint)
+	{
+		Vector3 distToMidpoint = testPoint - midpointPos;
+		if (distToMidpoint.magnitude() == 0) {
+			return INFINITY;
+		}
+		return Vector3::Dot(dipoleMoment, distToMidpoint.normalized()) * k / distToMidpoint.magnitudeSquared();
+	};
+	return Charge(midpointPos, 0, 0, eFieldFunc, potentialFunc); // This shouldn't have 0 charge
+}
+
+
 /* I'm gonna hold off on these for this commit, I really want to figure out a general way to
    calculate electric fields for these shapes in 3D regardless of orientation. Maybe I'll need
    calculus, who knows!
-
-Charge Charge::Dipole(Vector3 pos1, Vector3 pos2, float q, float q2)
-{
-	// Defaults to dipole with equal but opposite charges
-	if (q2 == 0) {
-		q2 = -q;
-	}
-	else {
-		q2 = q; // Fix this
-	}
-
-	Vector3 dipoleMoment = (pos2 - pos1) * q;
-	Vector3 midPoint = Vector3::Midpoint(pos1, pos2);
-	float a = 0.5 * (pos2 - pos1).magnitude();
-	std::function<Vector3(Vector3 testPoint)> eFieldFunc = [dipoleMoment, midPoint, a, q](Vector3 testPoint)
-	{
-		float xDistance = (testPoint - midPoint).x;
-		float yDistance = (testPoint - midPoint).y;
-		float xMag = (k * q) * ((xDistance / pow(pow(yDistance, 2) + pow(xDistance, 2), 1.5f)) - (xDistance / pow(pow(yDistance - 2 * a, 2) + pow(xDistance, 2), 1.5f)));
-		float yMag = (k * q) * ((yDistance / pow(pow(yDistance, 2) + pow(xDistance, 2), 1.5f)) - ((yDistance - 2 * a) / pow(pow(yDistance - 2 * a, 2) + pow(xDistance, 2), 1.5f)));
-		return Vector3(xMag, yMag, 0);
-	};
-	return Charge(midPoint, q + q2, 0, eFieldFunc);
-}
-
-Charge Charge::Dipole(Vector3 pos, Vector3 dipoleMoment)
-{
-	return Charge();
-}
 
 Charge Charge::Line(float q, Vector3 midpointPos, Vector3 velocity, float length)
 {
